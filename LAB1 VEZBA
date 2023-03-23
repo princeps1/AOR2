@@ -1,0 +1,53 @@
+library ieee;
+use ieee.std_logic_1164.all;
+entity dflipflop_async is
+    port(d : in bit;
+        clk : in bit;
+        rst : in bit;
+        q : out bit );
+end entity dflipflop_async;
+
+architecture dff_async_arch of dflipflop_async is
+begin
+     q <=
+     '0' when rst ='1' else
+      d when clk'event and clk ='1';
+
+end architecture dff_async_arch;
+
+--=========================
+library ieee;
+use ieee.std_logic_1164.all;
+entity dflipflop_async_tb is
+end entity;
+
+architecture dflipflop_async_tb of dflipflop_async_tb is
+    signal d, clk, rst, q : bit;
+begin
+    DUT: entity work.dflipflop_async(dff_async_arch)
+        port map(d => d, clk => clk, rst => rst, q => q);
+    
+    CLOCK : process
+    begin
+        clk <= '1';
+        wait for 10 ns;
+        clk <= '0';
+        wait for 10 ns;
+    end process;
+
+    STIMULI: process
+    begin
+        d <= '1';
+        wait for 25ns;
+        rst <= '1';
+        wait for 10ns;
+        rst <='0';
+        wait for 5ns;
+
+        d <= '0';
+        wait for 20ns;
+
+        d <= '1';
+        wait for 20ns;
+    end process;
+end architecture dflipflop_async_tb;
