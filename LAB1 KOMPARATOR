@@ -1,0 +1,41 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+
+entity komparator is
+port(a : in signed (7 downto 0);
+	 b : in signed (7 downto 0);
+	 c : out signed (7 downto 0));
+end entity;
+
+architecture komparator_arch of komparator is
+begin
+	process (a,b) begin
+		if (a>b) then
+			c<=a;
+		else
+			c<=b;
+		end if;
+	end process;
+end architecture;
+
+
+entity komparator_tb of komparator is
+end entity;
+
+architecture komparator_tb of komparator_tb is
+	signal a_tb, b_tb, c_tb: signed (7 downto 0);
+begin
+DUT1: entity work.komparator(komparator_arch) 
+	port map( a=> a_tb, b=>b_tb, c=>c_tb);
+UPOREDI: process
+begin
+	a<= "00000011";
+	b<= "00001000";
+	wait for 10ns;
+	
+	a<= "10000000";
+	b<= "00000001";
+	wait for 10ns;
+end process;
+end architecture;
