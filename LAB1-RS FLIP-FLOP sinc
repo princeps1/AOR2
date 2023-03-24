@@ -1,0 +1,77 @@
+library IEEE;
+use ieee.std_logic_1164.all;
+
+entity rsff_sync is
+	port (r: in std_logic;
+		  s: in std_logic;
+		  rst: in std_logic;
+		  clk: in std_logic;
+		  q: out std_logic);
+end entity;
+
+architecture rsff_sync_arch of rsff_sync is
+begin
+process(clk) is
+	begin
+	if clk'event and clk='1' then
+		if rst='1' then
+			q<='0';
+		elsif s='0' and r='1' then
+			q<='0';
+		elsif s='1' and s='0' then
+			q<='1';
+		elsif s='1' and r='1' then
+			q<='X';
+		end if;
+	end if;
+end process;
+end architecture;
+
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity rsff_sync_tb is
+end entity;
+
+architecture rsff_sync_tb of rsff_sync_tb is
+signal r_tb, s_tb, rst_tb, clk_tb, q_tb: std_logic;
+begin
+DUT1: entity work.rsff_sync(rsff_sync_arch)
+port map(r=>r_tb,
+		 s=>s_tb,
+		 rst=>rst_tb,
+		 clk=>clk_tb,
+		 q=>q_tb);
+			 
+clock: process
+begin
+	clk_tb<='1';
+	wait for 10ns;
+	clk_tb<='0';
+	wait for 10ns;
+end process;
+	
+stimulus: process
+	begin
+	s_tb<='1';
+	r_tb<='0';
+	wait for 10ns;
+    
+	s_tb<='0';
+	r_tb<='1';
+	wait for 20ns;
+    
+    rst_tb<='1';
+    wait for 15ns;
+    
+    rst_tb<='0';
+    s_tb<='0';
+    r_tb<='0';
+    wait for 10ns;
+    
+	r_tb<='1';
+	s_tb<='1';
+    wait for 10ns;
+    
+	end process;
+end architecture;
