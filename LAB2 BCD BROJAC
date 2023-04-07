@@ -1,0 +1,119 @@
+-- Code your design here
+-- Code your design here
+library IEEE;
+use IEEE.std_logic_1164.all;
+library IEEE;
+use IEEE.std_logic_1164.all;
+entity bcd_counter is
+	port (ce: IN std_logic;
+    	   wr: IN std_logic;
+           clk: IN std_logic;
+           din: IN std_logic_vector(11 downto 0);
+           qout: OUT std_logic_vector(11 downto 0));
+end entity;
+
+architecture arch of bcd_counter is
+begin
+	process( clk)
+    	variable c1: std_logic_vector(3 downto 0);
+        variable c10: std_logic_vector(3 downto 0);
+        variable c100: std_logic_vector(3 downto 0);
+    begin
+         if clk'event and clk = '1' then
+         	if wr='1' then
+            	c1 := din(3 downto 0);
+                c10 := din(7 downto 4);
+                c100 := din(11 downto 8);
+            elsif ce='1' then
+            	case c1 is
+                	when "1001" => c1 := "1000";
+                    when "1000" => c1 := "0111";
+                    when "0111" => c1 := "0110";
+                    when "0110" => c1 := "0101";
+                    when "0101" => c1 := "0100";
+                    when "0100" => c1 := "0011";
+                    when "0011" => c1 := "0010";
+                    when "0010" => c1 := "0001";
+                    when "0001" => c1 := "0000";
+                    when "0000" => c1 := "1001";
+                    when others => c1 := "0000";
+                 end case;
+                 
+                 if (c1 = "1001") then
+                 	case c10 is
+                      when "1001" => c10 := "1000";
+                      when "1000" => c10 := "0111";
+                      when "0111" => c10 := "0110";
+                      when "0110" => c10 := "0101";
+                      when "0101" => c10 := "0100";
+                      when "0100" => c10 := "0011";
+                      when "0011" => c10 := "0010";
+                      when "0010" => c10 := "0001";
+                      when "0001" => c10 := "0000";
+                      when "0000" => c10 := "1001";
+                      when others => c10 := "0000";
+                 	end case;
+                    
+                    if (c10 = "1001") then
+                      case c100 is
+                        when "1001" => c100 := "1000";
+                        when "1000" => c100 := "0111";
+                        when "0111" => c100 := "0110";
+                        when "0110" => c100 := "0101";
+                        when "0101" => c100 := "0100";
+                        when "0100" => c100 := "0011";
+                        when "0011" => c100 := "0010";
+                        when "0010" => c100 := "0001";
+                        when "0001" => c100 := "0000";
+                        when "0000" => c100 := "1001";
+                        when others => c100 := "0000";
+                      end case;
+                     end if;
+                 end if;
+            
+            
+            end if;
+            qout(3 downto 0) <= c1;
+            qout(7 downto 4) <= c10;
+            qout(11 downto 8) <= c100;
+         
+         
+         end if;
+        end process;
+       end architecture;
+
+
+
+-- Code your testbench here
+library IEEE;
+use IEEE.std_logic_1164.all;
+entity bcd_counter_tb is
+    end entity;
+
+architecture bcd_counter_tb of bcd_counter_tb is
+    signal ce, wr, clk: std_logic;
+    signal din, qout: std_logic_vector(11 downto 0);
+    begin
+        dut: entity work.bcd_counter(arch)
+            port map(ce=>ce, wr=>wr, clk=>clk, din=>din, qout=>qout);
+        clock: process
+        begin
+            clk<='1';
+            wait for 10ns;
+            clk<='0';
+            wait for 10ns;
+        end process;
+
+        stimulus: process
+        begin
+            wr<='1';
+            ce<='0';
+            din<="001100010010";
+            wait for 5ns;
+            ce<='1';
+            wait for 20ns;
+            wr<='0';
+            wait for 500ns;
+        end process;
+     end architecture;
+
