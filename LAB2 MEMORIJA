@@ -1,0 +1,38 @@
+--TREBA REALIZOVATI MODEL MEMORIJE KOJ APAMTI 64 REALNE VREDNOSTI, INICIJALIZOVANA NULAMA 
+--UVEDENO POLJA, KORISNICKI TIPOVI, PODTIPOVI
+
+subtype coeff_ram_address is integer range 0 to 63;
+----------------------------------------------------
+entity coeff_ram is
+	port (rd, wr: in bit; --POSTO SU ODVOJENI SIGNALI, ZNACI DA MEMORIJA MOZE U ISTOM TAKTU I DA CITA I DA UPISUJE
+		  addr: in coeff_ram_address;
+		  d_in: in real; --floating point 
+		  d_out: out real
+		  );
+end entity;
+
+architecture abstract of coeff_ram is
+begin
+	memory: process is 
+		type coeff_array is array (coeff_ram_address) of real; --NIZ CE IMATI ONOLIKO KOMPONENATA KOLIKO DOZVOLJAVA 6BIT ADRESA
+		variable coeff: coeff_array; 
+		
+	begin
+		for index in coeff_ram_address loop --OBEZBEDJUJE INICIJALIZACJU MEMORIJE NA 0
+			coef(index):=0.0;
+			--INICIJALIZACIJA NIJE SINTETIZABILNA!
+			--UMESTO TOGA RESET, PORT,..., KAO U RANIJIM PRIMERIMA!
+			--TREBA DA IMAMO RESET SIGNAL PA AKO JE RESET=0 ONDA DA SVI OVI MEMORIJSKI ELEMENTI BUDU 0;
+		end loop
+		loop
+			wait on rd, wr, addr, d_in;
+			if rd='1' then
+				d_out<=coeff(addr);
+			end if;
+			if wr='1' then
+				coeff(addr):=d_in;
+			end if; --SA OVA DVA IFA SMO OBEZBEDILI DA MOZEMO ISTOVREMENO I DA CITAMO I DA UPISUJEMO PODATKE
+					--DA SMO NPR UMESTO END IF STAVILI ELSE IF ONDA BI SE DOGADJALO KAKO JE NAPISANO
+		end loop;
+	end process;
+end architecture;
