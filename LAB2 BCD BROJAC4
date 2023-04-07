@@ -1,0 +1,32 @@
+--TREBA REALIZOVATI BROJAC OSNOVE 16 (UVODIMO LOOP, EXIT, NUMERICKE TIPOVE, WAIT UNTIL)
+
+entity counter is
+port (clk, reset: in bit;
+	  count: out natural); --NATURAL JE PODTIP OD INTEGER
+end entity;
+
+architecture behaviour of counter is
+begin
+	incrementer:
+	process is
+		variable count_value: natural:=0; 
+		--ZBOG INICIJALIZACIJE, NIJE SINTETIZABILNO
+	begin
+		count<=count_value;
+		--POSTO IMAMO INICIJALIZACIJU MORAMO TU VREDNOST DA DODELIMO N APORT
+		--ZA SINTETIZABILNU VERZIJU OVO NIJE POTREBNO JER NAM JE PO RESETU ODMAH NA 0
+		loop
+			loop 
+				wait until clk='1' or reset='1';
+				exit when reset='1';
+				count_value:=(count_value+1) mod 16; --OVO JE MOGUCE JER SMO KORISTILI NUMERICKI TIP A NE VECTORE (NATURAL)
+				count<=count_value;
+			end loop;
+			count_value:=0; --LOGIKA ZA RESETOVANJE, OVDE DOLAZI KADA JE RESET='1';
+			count<=count_value;
+			wait until reset='0';
+		end loop;
+	end process;
+end architecture;
+			
+			
