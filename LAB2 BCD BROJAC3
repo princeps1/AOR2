@@ -1,0 +1,37 @@
+--Treba realizovati jednocifreni BCD kruzni brojac koji broji unapred, na svaku drugu prednju ivicu takta
+
+entity counter_ent is
+	port(clr: in bit;
+		 clk: in bit;
+		 q 	: out bit_vector(3 downto 0)
+		);
+end entity;
+
+architecture counter_arch of counter_ent is
+begin
+	process(clr, clk)
+		variable: q_int: bit_vector(3 downto 0); -- POSTO JE SEKVENCIJALNO KOLO UGLAVNOM CEMO IMATI variable
+		variable: cq: bit; --DA NAM BROJI SVAKI DRUGI TAKT
+	begin
+		if clr='1' THEN --PRVO KORISTIMO ASINHRONI RESET I AKO JE RESET AKTIVAN
+			q_int:="0000";
+			cq:='0';
+		else if clk'event and clk='1' then --AKO RESET NIJE AKTIVAN ONDA SE POSMATRA PREDNJA IVICA TAKTA
+		cq:=not cq; --OVDE USPOSTAVLJAMO USLOV DA JE NA SVAKU DRUGU JER NAIZMENICNO SMENJUJEMO TAKTOVE
+		if cq='1' then
+			case q_int is
+				when "0000" => q_int:="0001";
+				when "0001" => q_int:="0010";
+				when "0010" => q_int:="0011";
+				when "0100" => q_int:="0101";
+				when "0101" => q_int:="0110";
+				when "0110" => q_int:="0111";
+				when "0111" => q_int:="1000";
+				when "1000" => q_int:="1001"; 
+				when others => q_int:="0000"; --KADA JE 9 ILI NEKO DRUGO STANJE, SLEDECE JE 0
+			end case;
+		end if;
+		end if;
+	q<=q_int; --Q NAM JE IZLAZNI PORT(SIGNAL) I ZATO IDE Q_INT U Q
+	end process;
+end architecture;
